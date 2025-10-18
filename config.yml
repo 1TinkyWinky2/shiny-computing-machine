@@ -6,7 +6,7 @@ trigger:
       - main   # o la rama que uses
 
 pool:
-  name: 'AgenteLocal'   # nombre exacto del pool que creaste en Azure DevOps
+  name: 'agentelocal'   # nombre exacto del pool que creaste en Azure DevOps
 
 stages:
   - stage: Terraform
@@ -49,3 +49,4 @@ stages:
               zip -r app.zip .
               az webapp deployment source config-zip --resource-group rg-bezkoder-app --name bezkoder-api --src app.zip
             displayName: 'Publicar aplicación en App Service'
+
