@@ -1,0 +1,51 @@
+# Archivo: azure-pipelines.yml
+
+trigger:
+  branches:
+    include:
+      - main   # o la rama que uses
+
+pool:
+  name: 'AgenteLocal'   # nombre exacto del pool que creaste en Azure DevOps
+
+stages:
+  - stage: Terraform
+    displayName: 'Aprovisionar infraestructura con Terraform'
+    jobs:
+      - job: terraform_deploy
+        displayName: 'Despliegue infraestructura Azure'
+        steps:
+          - checkout: self
+
+          - script: |
+              cd terraform
+              terraform init
+              terraform validate
+              terraform plan
+              terraform apply -auto-approve
+            displayName: 'Ejecutar Terraform'
+
+  - stage: Ansible
+    displayName: 'Configurar base de datos con Ansible'
+    dependsOn: Terraform
+    jobs:
+      - job: ansible_config
+        displayName: 'Configurar MySQL'
+        steps:
+          - script: |
+              cd ansible
+              ansible-playbook -i inventory.ini playbook.yml
+            displayName: 'Ejecutar Ansible'
+
+  - stage: DeployApp
+    displayName: 'Desplegar aplicación Node.js en App Service'
+    dependsOn: Ansible
+    jobs:
+      - job: deploy
+        displayName: 'Carga del código Node.js'
+        steps:
+          - script: |
+              cd app
+              zip -r app.zip .
+              az webapp deployment source config-zip --resource-group rg-bezkoder-app --name bezkoder-api --src app.zip
+            displayName: 'Publicar aplicación en App Service'
