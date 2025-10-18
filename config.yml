@@ -6,7 +6,7 @@ trigger:
       - main   # o la rama que uses
 
 pool:
-  name: 'agentelocal'   # nombre exacto del pool que creaste en Azure DevOps
+  name: 'Agentelocal'   # nombre exacto del pool que creaste en Azure DevOps
 
 stages:
   - stage: Terraform
